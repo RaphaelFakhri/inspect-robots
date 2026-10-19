@@ -34,6 +34,7 @@ from __future__ import annotations
 import configparser
 import math
 import os
+import re
 import sys
 from collections.abc import Mapping
 from dataclasses import dataclass, field
@@ -53,6 +54,10 @@ _ENV_SIM_EMBODIMENT = "INSPECT_ROBOTS_SIM_EMBODIMENT"
 _ADHOC_SCORER_FALLBACK = "operator"
 _ADHOC_MAX_STEPS_FALLBACK = 300
 
+# A digit string with a leading zero (a RealSense serial such as
+# "035622060973") is an identifier, not a number: int() would drop the zeros.
+_ZERO_PADDED = re.compile(r"[+-]?0[0-9]")
+
 
 def _parse_value(text: str) -> Any:
     """Best-effort scalar parse for ``k=v`` args (bool/int/float/None/str).
@@ -71,6 +76,8 @@ def _parse_value(text: str) -> Any:
         return low == "true"
     if low in ("none", "null"):
         return None
+    if _ZERO_PADDED.match(text):
+        return text
     for caster in (int, float):
         try:
             val = caster(text)
