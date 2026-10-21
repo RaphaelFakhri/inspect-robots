@@ -199,12 +199,17 @@ def test_parse_value_scalars() -> None:
     assert parse_value("-infinity") == "-infinity"
 
 
-@pytest.mark.parametrize("text", ["035622060973", "007", "-012", "+00", "0123.5"])
+@pytest.mark.parametrize(
+    "text",
+    ["035622060973", "007", "-012", "+00", "0123.5", "00.5", "012e3", " 035622060973", "007\t"],
+)
 def test_parse_value_keeps_zero_padded_numbers_as_strings(text: str) -> None:
     assert parse_value(text) == text
 
 
-@pytest.mark.parametrize(("text", "value"), [("0", 0), ("-0", 0), ("0.5", 0.5), ("0e3", 0.0)])
+@pytest.mark.parametrize(
+    ("text", "value"), [("0", 0), ("-0", 0), ("0.5", 0.5), ("0e3", 0.0), (" 0.5", 0.5)]
+)
 def test_parse_value_still_parses_numbers_starting_with_zero(text: str, value: float) -> None:
     parsed = parse_value(text)
     assert parsed == value and type(parsed) is type(value)

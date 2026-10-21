@@ -76,7 +76,8 @@ def _parse_value(text: str) -> Any:
         return low == "true"
     if low in ("none", "null"):
         return None
-    if _ZERO_PADDED.match(text):
+    # int() and float() skip surrounding whitespace, so match the same text.
+    if _ZERO_PADDED.match(text.strip()):
         return text
     for caster in (int, float):
         try:
