@@ -224,6 +224,22 @@ def test_config_args_keep_zero_padded_serial(tmp_path: Path) -> None:
     assert d.embodiment_args == {"top_depth_serial": "035622060973"}
 
 
+def test_config_padded_numeric_defaults_still_parse_as_integers(tmp_path: Path) -> None:
+    _write_config(tmp_path, "[defaults]\nmax_steps = 0300\nrerun_port = 09090\n")
+    d = load_defaults({"XDG_CONFIG_HOME": str(tmp_path)})
+    assert d.max_steps == 300
+    assert d.rerun_port == 9090
+
+
+def test_set_default_accepts_padded_numeric_defaults(tmp_path: Path) -> None:
+    env = {"XDG_CONFIG_HOME": str(tmp_path)}
+    set_default(env, "max_steps", "0300")
+    set_default(env, "rerun_port", "09090")
+    d = load_defaults(env)
+    assert d.max_steps == 300
+    assert d.rerun_port == 9090
+
+
 _SIM_CONFIG = """
 [defaults]
 embodiment = yam-bimanual
